@@ -1,0 +1,33 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "example_root_password"
+      MYSQL_USER: "sample_user"
+      MYSQL_PASSWORD: "sample_password"
+      MYSQL_DATABASE: "sample_rails_db"
+      TZ: 'Asia/Tokyo'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      RAILS_ENV: "development"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "example_root_password"
+      MYSQL_HOST: db
+    volumes:
+      - .:/myapp
+      - bundle_data:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+volumes:
+  bundle_data:
+  mysql_data:
